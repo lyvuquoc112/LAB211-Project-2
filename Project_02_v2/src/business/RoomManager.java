@@ -19,10 +19,9 @@ public class RoomManager {
         this.roomIds = new HashSet<>();
     }
 
-    public boolean importRoomsFromFile() {
+    public void importRoomsFromFile() {
         int successCount = 0;
         int failCount = 0;
-        
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -41,13 +40,12 @@ public class RoomManager {
             }
             System.out.println(successCount + " rooms successfully loaded.");
             System.out.println(failCount + " entries failed.");
-            return true;
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
-            return false;
         }
     }
-
+    
+    
     private Room parseRoomLine(String line) {
         String[] parts = line.split(";");
         if (parts.length != 6) {
@@ -85,5 +83,30 @@ public class RoomManager {
 
     public List<Room> getRooms() {
         return new ArrayList<>(rooms);
+    }
+
+    public void displayAvailableRooms() {
+        if (rooms.isEmpty()) {
+            System.out.println("Room list is currently empty, not loaded yet.");
+            return;
+        }
+
+        // Print header
+        System.out.println("\n=== Available Room List ===");
+        System.out.printf("%-10s %-20s %-15s %-12s %-10s %-30s%n",
+                "Room ID", "Room Name", "Room Type", "Daily Rate", "Capacity", "Furniture Description");
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+
+        // Print each room
+        for (Room room : rooms) {
+            System.out.printf("%-10s %-20s %-15s $%-11.2f %-10d %-30s%n",
+                    room.getRoomId(),
+                    room.getRoomName(),
+                    room.getRoomType(),
+                    room.getDailyRate(),
+                    room.getCapacity(),
+                    room.getFurnitureDescription());
+        }
+        System.out.println("--------------------------------------------------------------------------------------------------------");
     }
 } 

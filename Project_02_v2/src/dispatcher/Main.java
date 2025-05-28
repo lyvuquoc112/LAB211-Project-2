@@ -31,7 +31,7 @@ public class Main {
                     roomManager.importRoomsFromFile();
                     break;
                 case 2:
-                    System.out.println("Display Available Room List - Function not implemented yet");
+                    roomManager.displayAvailableRooms();
                     break;
                 case 3:
                     System.out.println("Enter Guest Information - Function not implemented yet");
