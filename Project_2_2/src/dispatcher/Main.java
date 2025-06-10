@@ -4,18 +4,24 @@
  */
 package dispatcher;
 
+import business.GuestManager;
 import business.RoomManager;
 import java.util.Scanner;
+import tool.Inputter;
 
 /**
  *
  * @author hanly
  */
 public class Main {
+    
+    
+    public static final int CONTINUE = 1;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         RoomManager manager = new RoomManager("D:\\FPT\\Ky 3\\LAB211\\SE1806-LAB211-main\\Set14_SU25\\De_LAB211\\02_J1.L.P0030.RoomManagementModule_500LOC\\Active_Room_List.txt");
-        
+        GuestManager guestManager = new GuestManager();
+        Inputter inputter = new Inputter();
         while (true) {
             // Hiển thị menu
             System.out.println("\n=== ATZ RESORT MANAGEMENT SYSTEM ===");
@@ -46,9 +52,15 @@ public class Main {
                     break;
                     
                 case 3:
-                    System.out.println("\n=== Enter Guest Information ===");
+                    int option;
+                    do {                        
+                        guestManager.addNew(inputter.inputGuest(false));
+                        System.out.println("1. Continue entering customer information");
+                        System.out.println("2. Back to main menu");
+                        option = Integer.parseInt(inputter.input("Chose your option", "Option must be 1 or 2", "^[12]$"));
+                    } while (option == CONTINUE);
                     // TODO: Implement enter guest information
-                    System.out.println("Function not implemented yet");
+                   
                     break;
                     
                 case 4:

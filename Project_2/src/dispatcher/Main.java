@@ -4,18 +4,27 @@
  */
 package dispatcher;
 
+import business.GuestManager;
 import business.RoomManager;
 import java.util.Scanner;
+import model.Guest;
+import tool.Inputter;
+import tool.Validator;
 
 /**
  *
  * @author hanly
  */
 public class Main {
+    
+    
+    public static final int CONTINUE = 1;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        RoomManager manager = new RoomManager("D:\\FPT\\Ky 3\\LAB211\\SE1806-LAB211-main\\Set14_SU25\\De_LAB211\\02_J1.L.P0030.RoomManagementModule_500LOC\\Active_Room_List.txt");
-        
+        RoomManager roomManager = new RoomManager("D:\\FPT\\Ky 3\\LAB211\\SE1806-LAB211-main\\Set14_SU25\\De_LAB211\\02_J1.L.P0030.RoomManagementModule_500LOC\\Active_Room_List.txt");
+        GuestManager guestManager = new GuestManager();
+        Inputter inputter = new Inputter();
+        int option = CONTINUE;
         while (true) {
             // Hiển thị menu
             System.out.println("\n=== ATZ RESORT MANAGEMENT SYSTEM ===");
@@ -38,29 +47,54 @@ public class Main {
             switch (choice) {
                 case 1:
                     System.out.println("\n=== Import Room Data ===");
-                    manager.loadRoomDataFromFile();
+                    roomManager.loadRoomDataFromFile();
                     break;
                     
                 case 2:
-                    manager.displayAvailableRoomList();
+                    roomManager.displayAvailableRoomList();
                     break;
                     
                 case 3:
-                    System.out.println("\n=== Enter Guest Information ===");
+                    do {                        
+                        guestManager.addNew(inputter.inputGuest(false,null));
+                        System.out.println("1. Continue entering customer information");
+                        System.out.println("2. Back to main menu");
+                        option = Integer.parseInt(inputter.input("Chose your option", "Option must be 1 or 2", "^[12]$"));
+                    } while (option == CONTINUE);
                     // TODO: Implement enter guest information
-                    System.out.println("Function not implemented yet");
+                   
                     break;
                     
                 case 4:
                     System.out.println("\n=== Update Guest Stay Information ===");
-                    // TODO: Implement update guest information
-                    System.out.println("Function not implemented yet");
+                    String ID = inputter.input("Input National ID", "National ID must be exactly 12 digits", Validator.NATIONAL_ID_PATTERN);
+                    Guest guest = guestManager.findGuestById(ID);
+                    if(guest==null){
+                        System.out.println("No guest found with the requested ID!");
+                    }else{
+                        Guest updatedGuset = inputter.inputGuest(true, guest);
+                        if(updatedGuset!=null){
+                            guestManager.update(updatedGuset);
+                            System.out.println("Update successful");
+                            guestManager.displayGuestInfo(updatedGuset);
+                        }else{
+                            System.out.println("Update failed");
+                        }
+                    }
                     break;
                     
                 case 5:
-                    System.out.println("\n=== Search Guest by National ID ===");
-                    // TODO: Implement search guest
-                    System.out.println("Function not implemented yet");
+                    do {                        
+                        System.out.println("Enter National ID: ");
+                        String nationalID = scanner.nextLine();
+                        Guest g = guestManager.findGuestById(nationalID);
+                        if(g != null){
+                            guestManager.displayGuestAndRoomInformation(g, roomManager);
+                        }else{
+                            System.out.println("--------------------------------------------------------------------");
+                            System.out.println("No guest found with the requested ID '" + nationalID + "'");
+                        }
+                    } while (option == CONTINUE);
                     break;
                     
                 case 6:
