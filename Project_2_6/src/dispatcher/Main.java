@@ -56,7 +56,7 @@ public class Main {
 
                 case 3:
                     do {
-                        guestManager.addNew(inputter.inputGuest(false, null,roomManager,guestManager));
+                        guestManager.addNew(inputter.inputGuest(false, null));
                         System.out.println("1. Continue entering customer information");
                         System.out.println("2. Back to main menu");
                         option = Integer.parseInt(inputter.input("Chose your option", "Option must be 1 or 2", "^[12]$"));
@@ -72,7 +72,7 @@ public class Main {
                     if (guest == null) {
                         System.out.println("No guest found with the requested ID!");
                     } else {
-                        Guest updatedGuset = inputter.inputGuest(true, guest,roomManager,guestManager);
+                        Guest updatedGuset = inputter.inputGuest(true, guest);
                         if (updatedGuset != null) {
                             guestManager.update(updatedGuset);
                             System.out.println("Update successful");

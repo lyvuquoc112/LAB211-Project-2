@@ -21,23 +21,17 @@ import model.Room;
 public class RoomManager extends HashSet<Room> {
 
     private String pathFile;
-    private boolean isDataLoaded = false;
 
     public RoomManager(String pathFile) {
         super();
         try {
             this.pathFile = pathFile;
-            //this.loadRoomDataFromFile();
+            this.loadRoomDataFromFile();
         } catch (Exception e) {
         }
     }
 
     public void loadRoomDataFromFile() {
-        if (isDataLoaded) {
-            System.out.println("Room data has already been loaded.");
-            return;
-        }
-
         int successCount = 0;
         int failCount = 0;
 
@@ -57,7 +51,6 @@ public class RoomManager extends HashSet<Room> {
             }
             System.out.println(successCount + " rooms successfully loaded.");
             System.out.println(failCount + " entries failed.");
-            isDataLoaded = true;
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
         }
@@ -67,6 +60,7 @@ public class RoomManager extends HashSet<Room> {
         try {
             String[] parts = line.split(";");
             if (parts.length != 6) {
+                System.out.println("Invalid data format: " + line);
                 return false;
             }
 
@@ -77,17 +71,22 @@ public class RoomManager extends HashSet<Room> {
             int capacity = Integer.parseInt(parts[4].trim());
             String furnitureDescription = parts[5].trim();
 
+            // Validate daily rate and capacity
             if (dailyRate <= 0 || capacity <= 0) {
+                System.out.println("Invalid rate or capacity for room " + roomId);
                 return false;
             }
 
+            // Kiểm tra nếu phòng đã tồn tại
             if (isRoomExists(roomId)) {
+                System.out.println("Warning: Room " + roomId + " already exists. Skipping duplicate entry.");
                 return false;
             }
 
             Room room = new Room(roomId, roomName, roomType, dailyRate, capacity, furnitureDescription);
             return this.add(room);
         } catch (NumberFormatException e) {
+            System.out.println("Error parsing number in line: " + line);
             return false;
         }
     }
@@ -102,10 +101,7 @@ public class RoomManager extends HashSet<Room> {
     }
 
     public Room getRoomById(String roomId) {
-        System.out.println("DEBUG: Searching for room: '" + roomId + "'");
-        System.out.println("DEBUG: Current rooms in system: " + this.size());
         for (Room thi : this) {
-            System.out.println("DEBUG: Comparing with room: '" + thi.getRoomId() + "'");
             if (thi.getRoomId().equals(roomId.trim())) {
                 return thi;
             }

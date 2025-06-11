@@ -112,7 +112,7 @@ public class Inputter {
         return result;
     }
 
-    public Guest inputGuest(boolean isUpdated, Guest oldGuest, RoomManager roomManager, GuestManager guestManager) {
+    public Guest inputGuest(boolean isUpdated, Guest oldGuest) {
         Guest guest = new Guest();
 
         // Input National ID
@@ -184,6 +184,8 @@ public class Inputter {
 
         // Input Room ID
         if (!isUpdated) {
+            RoomManager roomManager = new RoomManager("D:\\FPT\\Ky 3\\LAB211\\SE1806-LAB211-main\\Set14_SU25\\De_LAB211\\02_J1.L.P0030.RoomManagementModule_500LOC\\Active_Room_List.txt");
+            GuestManager guestManager = new GuestManager();
             String roomId;
             do {
                 roomId = input("Input Room ID (e.g., R101): ", 
