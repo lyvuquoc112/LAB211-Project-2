@@ -8,8 +8,12 @@ import business.GuestManager;
 import business.RoomManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.Set;
 import model.Guest;
 
 /**
@@ -31,6 +35,7 @@ public class Inputter {
 
     public int getInt(String mess) {
         int result = 0;
+        String input;
         try {
             result = Integer.parseInt(mess);
         } catch (Exception e) {
@@ -41,6 +46,7 @@ public class Inputter {
 
     public double getDouble(String mess) {
         double result = 0;
+        String input;
         try {
             result = Double.parseDouble(mess);
         } catch (Exception e) {
@@ -114,7 +120,7 @@ public class Inputter {
         String errorMsg;
         String regex;
         if (!isUpdated) {
-            msg = "Input National ID (12 digits) ";
+            msg = "Input National ID (12 digits): ";
             errorMsg = "National ID must be exactly 12 digits!";
             regex = Validator.NATIONAL_ID_PATTERN;
             String nationalId = input(msg, errorMsg, regex);
@@ -126,7 +132,7 @@ public class Inputter {
 
         // Input Full Name
         if (!isUpdated) {
-            msg = "Input Full Name (2-25 characters, start with letter) ";
+            msg = "Input Full Name (2-25 characters, start with letter): ";
             errorMsg = "Name must be 2-25 characters and start with a letter!";
             regex = Validator.FULL_NAME_PATTERN;
             guest.setFullName(input(msg, errorMsg, regex));
@@ -137,7 +143,7 @@ public class Inputter {
 
         // Input Birthdate
         if (!isUpdated) {
-            msg = "Input Birthdate (yyyy-MM-dd) ";
+            msg = "Input Birthdate (yyyy-MM-dd): ";
             errorMsg = "Invalid date format! Use yyyy-MM-dd";
             Date birthdate = inputDate(msg, errorMsg, false); // false = không cho phép ngày tương lai
             guest.setBirthdate(birthdate);
@@ -156,11 +162,11 @@ public class Inputter {
         }
 
         // Input Phone Number
-        msg = "Input Phone Number (10 digits) ";
+        msg = "Input Phone Number (10 digits): ";
         errorMsg = "Invalid phone number format!";
         regex = Validator.PHONE_PATTERN;
         if (isUpdated) {
-            System.out.println(msg +" (press Enter to keep current "+oldGuest.getPhoneNumber() +")");
+            System.out.println(msg +" (press Enter to keep current "+oldGuest.getPhoneNumber() +"):");
             String phone = sc.nextLine().trim();
             if (!phone.isEmpty()) {
                 if (phone.matches(regex)) {
@@ -205,10 +211,10 @@ public class Inputter {
         }
 
         // Input Rental Days
-        msg = "Input Number of Rental Days ";
+        msg = "Input Number of Rental Days: ";
         errorMsg = "Rental days must be positive!";
         if (isUpdated) {
-            System.out.println(msg +" (press Enter to keep current "+oldGuest.getRentalDays() +")");
+            System.out.println(msg +" (press Enter to keep current "+oldGuest.getRentalDays() +"):");
             String daysStr = sc.nextLine().trim();
             if (!daysStr.isEmpty()) {
                 try {
@@ -233,7 +239,7 @@ public class Inputter {
 
         // Input Start Date
         if (!isUpdated) {
-            msg = "Input Start Date (yyyy-MM-dd) ";
+            msg = "Input Start Date (yyyy-MM-dd): ";
             errorMsg = "Start date must be in the future!";
             Date startDate = inputDate(msg, errorMsg, true); // true = chỉ cho phép ngày tương lai
             guest.setStartDate(startDate);
@@ -243,7 +249,7 @@ public class Inputter {
 
         // Input Co-tenant Name (optional)
         if (isUpdated) {
-            System.out.print("Input Co-tenant name (press Enter to keep " +oldGuest.getCoTenantName()+") ");
+            System.out.print("Input Co-tenant name (press Enter to keep " +oldGuest.getCoTenantName()+"): ");
             String coTenant = sc.nextLine().trim();
             if (!coTenant.isEmpty()) {
                 guest.setCoTenantName(coTenant);
@@ -251,7 +257,7 @@ public class Inputter {
                 guest.setCoTenantName(oldGuest.getCoTenantName());
             }
         } else {
-            System.out.print("Input Co-tenant Name (optional, press Enter to skip) ");
+            System.out.print("Input Co-tenant Name (optional, press Enter to skip): ");
             String coTenant = sc.nextLine().trim();
             if (!coTenant.isEmpty()) {
                 guest.setCoTenantName(coTenant);
