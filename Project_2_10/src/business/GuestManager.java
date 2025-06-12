@@ -27,11 +27,6 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
     private boolean saved;
     private String pathFile;
 
-    public GuestManager() {
-    }
-
-    
-    
     public GuestManager(String pathFile) {
         this.pathFile = pathFile;
     }

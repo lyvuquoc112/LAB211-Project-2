@@ -171,35 +171,9 @@ public class Menu {
     }
 
     private static void handelRevenueReportByRoomType() {
-        System.out.println("\nSelect Room Type:");
-        System.out.println("1. Deluxe");
-        System.out.println("2. Standard");
-        System.out.println("3. Suite");
-        System.out.println("4. Superior");
-        
-        String choice = inputter.input("Enter your choice (1-4): ",
-                "Invalid choice! Please enter a number between 1 and 4.",
-                "^[1-4]$");
-        
-        String roomType;
-        switch (choice) {
-            case "1":
-                roomType = "Deluxe";
-                break;
-            case "2":
-                roomType = "Standard";
-                break;
-            case "3":
-                roomType = "Suite";
-                break;
-            case "4":
-                roomType = "Superior";
-                break;
-            default:
-                System.out.println("Invalid choice!");
-                return;
-        }
-        
+        String roomType = inputter.input("Enter room type (Deluxe/Standard/Suite/Superior): ",
+                "Invalid room type! Please enter a valid room type.",
+                "^(Deluxe|Standard|Suite|Superior)$");
         guestManager.displayRevenueByRoomType(roomType, roomManager);
     }
 

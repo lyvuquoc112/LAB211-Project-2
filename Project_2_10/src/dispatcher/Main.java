@@ -6,7 +6,10 @@ package dispatcher;
 
 import business.GuestManager;
 import business.RoomManager;
-
+import java.util.Scanner;
+import model.Guest;
+import tool.Inputter;
+import tool.Validator;
 
 /**
  *
