@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package tool;
 
 import business.GuestManager;
@@ -12,23 +9,16 @@ import java.util.Date;
 import java.util.Scanner;
 import model.Guest;
 
-/**
- *
- * @author hanly
- */
+
 public class Inputter {
-
     private Scanner sc;
-
     public Inputter() {
         sc = new Scanner(System.in);
     }
-
     public String getString(String mess) {
         System.out.println(mess);
         return sc.nextLine();
     }
-
     public int getInt(String mess) {
         int result = 0;
         try {
@@ -38,7 +28,6 @@ public class Inputter {
         }
         return result;
     }
-
     public double getDouble(String mess) {
         double result = 0;
         try {
@@ -52,11 +41,9 @@ public class Inputter {
     public Date inputDate(String msg, String errorMsg, boolean mustBeFuture) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         sdf.setLenient(false);  // Kiểm tra ngày chặt chẽ
-
         while (true) {
-            System.out.print(msg);
             try {
-                String dateStr = sc.nextLine().trim();
+                String dateStr = getString(msg).trim();
                 Date date = sdf.parse(dateStr);
 
                 // Kiểm tra ngày trong tương lai
@@ -118,7 +105,6 @@ public class Inputter {
             errorMsg = "National ID must be exactly 12 digits!";
             regex = Validator.NATIONAL_ID_PATTERN;
             String nationalId = input(msg, errorMsg, regex);
-            // Kiểm tra trùng lặp
             guest.setNationalId(nationalId);
         } else {
             guest.setNationalId(oldGuest.getNationalId());
@@ -130,7 +116,6 @@ public class Inputter {
             errorMsg = "Name must be 2-25 characters and start with a letter!";
             regex = Validator.FULL_NAME_PATTERN;
             guest.setFullName(input(msg, errorMsg, regex));
-
         } else {
             guest.setFullName(oldGuest.getFullName());
         }
@@ -159,46 +144,47 @@ public class Inputter {
         msg = "Input Phone Number (10 digits) ";
         errorMsg = "Invalid phone number format!";
         regex = Validator.PHONE_PATTERN;
-        if (isUpdated) {
-            System.out.println(msg +" (press Enter to keep current "+oldGuest.getPhoneNumber() +")");
-            String phone = sc.nextLine().trim();
-            if (!phone.isEmpty()) {
-                if (phone.matches(regex)) {
-                    guest.setPhoneNumber(phone);
+        boolean more = false;
+        do {
+            if (isUpdated) {
+                System.out.println(msg + " (press Enter to keep current " + oldGuest.getPhoneNumber() + ")");
+                String phone = sc.nextLine().trim();
+                if (!phone.isEmpty()) {
+                    if (phone.matches(regex)) {
+                        guest.setPhoneNumber(phone);
+                        more = true;
+                    } else {
+                        System.out.println(errorMsg);
+                    }
                 } else {
-                    System.out.println(errorMsg);
-                    return null;
+                    guest.setPhoneNumber(oldGuest.getPhoneNumber());
+                    more = true;
                 }
             } else {
-                guest.setPhoneNumber(oldGuest.getPhoneNumber());
+                guest.setPhoneNumber(input(msg, errorMsg, regex));
+                more = true;
             }
-        } else {
-            guest.setPhoneNumber(input(msg, errorMsg, regex));
-        }
+        } while (!more);
 
         // Input Room ID
         if (!isUpdated) {
             String roomId;
             do {
-                roomId = input("Input Room ID (e.g., R101): ", 
-                    "Room ID must start with R and followed by 3 digits!", 
-                    Validator.ROOM_ID_PATTERN).trim();
-                
+                roomId = input("Input Room ID (e.g., R101): ",
+                        "Room ID must start with R and followed by 3 digits!",
+                        Validator.ROOM_ID_PATTERN).trim();
                 // Kiểm tra phòng có tồn tại không
                 if (!roomManager.isRoomExists(roomId)) {
                     System.out.println("Room " + roomId + " does not exist!");
                     continue;
                 }
-                
                 // Kiểm tra phòng đã được đặt chưa
                 if (guestManager.isRoomRented(roomId)) {
                     System.out.println("Room " + roomId + " is already rented!");
                     continue;
                 }
-                
                 break;
             } while (true);
-            
             guest.setRoomId(roomId);
         } else {
             guest.setRoomId(oldGuest.getRoomId());
@@ -208,7 +194,7 @@ public class Inputter {
         msg = "Input Number of Rental Days ";
         errorMsg = "Rental days must be positive!";
         if (isUpdated) {
-            System.out.println(msg +" (press Enter to keep current "+oldGuest.getRentalDays() +")");
+            System.out.println(msg + " (press Enter to keep current " + oldGuest.getRentalDays() + ")");
             String daysStr = sc.nextLine().trim();
             if (!daysStr.isEmpty()) {
                 try {
@@ -227,7 +213,6 @@ public class Inputter {
                 guest.setRentalDays(oldGuest.getRentalDays());
             }
         } else {
-
             guest.setRentalDays(inputNumber(msg, errorMsg));
         }
 
@@ -243,7 +228,7 @@ public class Inputter {
 
         // Input Co-tenant Name (optional)
         if (isUpdated) {
-            System.out.print("Input Co-tenant name (press Enter to keep " +oldGuest.getCoTenantName()+") ");
+            System.out.print("Input Co-tenant name (press Enter to keep " + oldGuest.getCoTenantName() + ") ");
             String coTenant = sc.nextLine().trim();
             if (!coTenant.isEmpty()) {
                 guest.setCoTenantName(coTenant);

@@ -6,19 +6,18 @@ package business;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Scanner;
 import model.Guest;
-import model.Room;
+import model.Room;  
 
 /**
  *
  * @author hanly
  */
-public class RoomManager extends HashSet<Room> {
+public class RoomManager extends ArrayList<Room> {
 
     private String pathFile;
     private boolean isDataLoaded = false;
@@ -27,13 +26,12 @@ public class RoomManager extends HashSet<Room> {
         super();
         try {
             this.pathFile = pathFile;
-            //this.loadRoomDataFromFile();
         } catch (Exception e) {
         }
     }
 
     public void loadRoomDataFromFile() {
-        if (isDataLoaded) {
+        if (isDataLoaded) { 
             System.out.println("Room data has already been loaded.");
             return;
         }
@@ -77,14 +75,14 @@ public class RoomManager extends HashSet<Room> {
             int capacity = Integer.parseInt(parts[4].trim());
             String furnitureDescription = parts[5].trim();
 
-            if (dailyRate <= 0 || capacity <= 0) {
+            if (dailyRate <= 0 || !parts[3].contains(".")|| capacity <= 0) {
                 return false;
             }
+            
             if (isRoomExists(roomId)) {
                 return false;
             }
-            Room room = new Room(roomId, roomName, roomType, dailyRate, capacity, furnitureDescription);
-            return this.add(room);
+            return this.add(new Room(roomId, roomName, roomType, dailyRate, capacity, furnitureDescription));
         } catch (NumberFormatException e) {
             return false;
         }
@@ -92,7 +90,7 @@ public class RoomManager extends HashSet<Room> {
 
     public boolean isRoomExists(String roomId) {
         for (Room thi : this) {
-            if (thi.getRoomId().equals(roomId.trim())) {
+            if (thi.getRoomId().equalsIgnoreCase(roomId.trim())) {
                 return true;
             }
         }
@@ -101,7 +99,7 @@ public class RoomManager extends HashSet<Room> {
 
     public Room getRoomById(String roomId) {
         for (Room thi : this) {
-            if (thi.getRoomId().equals(roomId.trim())) {
+            if (thi.getRoomId().equalsIgnoreCase(roomId.trim())) {
                 return thi;
             }
         }
@@ -127,7 +125,7 @@ public class RoomManager extends HashSet<Room> {
         }
     }
 
-    public void displayVacantRooms(GuestManager guestManager) {
+    public void displayVacantRooms(GuestManager guestManager) {   
         if (this.isEmpty()) {
             System.out.println("Room list is currently empty, not loaded yet");
             return;
@@ -168,5 +166,4 @@ public class RoomManager extends HashSet<Room> {
             System.out.println("\nAll rooms have currently been rented out; no rooms are available");
         }
     }
-
 }

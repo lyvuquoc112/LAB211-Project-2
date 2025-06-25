@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import tool.DisplayFormatter;
 
 /**
@@ -30,8 +33,6 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
     public GuestManager() {
     }
 
-    
-    
     public GuestManager(String pathFile) {
         this.pathFile = pathFile;
     }
@@ -94,9 +95,11 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
 
     public void displayMonthlyRevenueReport(String targetMonth, RoomManager roomManager) {
         try {
-            // 1. Chuyển đổi chuỗi tháng thành Date
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
-            Date date = dateFormat.parse(targetMonth);
+            
+            //1. Chuyển đổi chuỗi tháng thành Date
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
+            sdf.setLenient(false);
+            Date date = sdf.parse(targetMonth);
             
             // 2. Lấy tháng và năm từ Date
             Calendar cal = Calendar.getInstance();
@@ -108,25 +111,16 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
             Map<String, Double> revenueByRoom = new HashMap<>();
             
             // 4. Tính doanh thu cho từng phòng
-            for (Guest guest : this) {
-                Calendar guestDate = Calendar.getInstance();
-                guestDate.setTime(guest.getStartDate());
-                
-                if (guestDate.get(Calendar.MONTH) == month && 
-                    guestDate.get(Calendar.YEAR) == year) {
-                    
-                    Room room = roomManager.getRoomById(guest.getRoomId());
-                    if (room != null) {
-                        double revenue = room.getDailyRate() * guest.getRentalDays();
-                        revenueByRoom.put(guest.getRoomId(), revenue);
-                    } else {
-                        // Ghi log hoặc thông báo lỗi
-                        System.out.println("Warning: Room " + guest.getRoomId() + 
-                            " does not exist for guest " + guest.getNationalId());
-                    }
+            for (Guest thi : this) {
+                Calendar guestCal = Calendar.getInstance();
+                guestCal.setTime(thi.getStartDate());
+                if(guestCal.get(Calendar.MONTH)==month &&
+                        guestCal.get(Calendar.YEAR)== year){
+                    Room room = roomManager.getRoomById(thi.getRoomId());
+                    double revenue = room.getDailyRate()*thi.getRentalDays();
+                    revenueByRoom.put(thi.getRoomId(), revenue);
                 }
             }
-            
             // 5. Hiển thị báo cáo
             System.out.println("\nMonthly Revenue Report - '" + targetMonth + "'");
             System.out.println("----------------------------------------------------------------");
@@ -134,14 +128,17 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
                 "RoomID", "Room Name", "Room type", "DailyRate", "Amount");
             System.out.println("----------------------------------------------------------------");
             
+            
             // Kiểm tra có dữ liệu không
             if (revenueByRoom.isEmpty()) {
                 System.out.println("There is no data on guests who have rented rooms");
             } else {
                 // In thông tin từng phòng
-                for (String roomId : revenueByRoom.keySet()) {
+                List<String> sortedRevenueByRoom = new ArrayList<>(revenueByRoom.keySet());
+                Collections.sort(sortedRevenueByRoom);
+                for (String roomId : sortedRevenueByRoom) {
                     Room room = roomManager.getRoomById(roomId);
-                    System.out.printf("%-8s|%-20s|%-12s|%10.2f|%10.2f\n",
+                    System.out.printf("%-8s|%-20s|%-12s|%-10.2f|%10.2f\n",
                         room.getRoomId(),
                         room.getRoomName(),
                         room.getRoomType(),
@@ -158,7 +155,7 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
 
     public boolean isRoomRented(String roomId) {
         for (Guest guest : this) {
-            if (guest.getRoomId().equals(roomId)) {
+            if (guest.getRoomId().equalsIgnoreCase(roomId)) {
                 return true;
             }
         }
@@ -166,6 +163,7 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
     }
 
     public void displayRevenueByRoomType(String roomType, RoomManager roomManager) {
+
         // Kiểm tra roomType có hợp lệ không
         if (!isValidRoomType(roomType)) {
             System.out.println("Invalid room type!");
@@ -186,9 +184,9 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
         System.out.printf("%-12s|%10s\n", "Room type", "Amount");
         System.out.println("----------------------------");
 
-        System.out.printf("%-12s|$%10.2f\n",
+        System.out.printf("%-12s|%10s\n",
             roomType,
-            totalRevenue);
+            String.format("$%,.0f", totalRevenue));
         System.out.println("----------------------------");
     }
 
@@ -208,6 +206,7 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
     }
 
     public void saveGuestInfo() {
+        
         if(this.saved){
             return;
         }
@@ -224,6 +223,7 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
                     oos.writeObject(guest);
                 }
                 System.out.println("Guest information has been successfully saved to "+pathFile);
+                this.saved = true;
             }
         } catch (IOException e) {
             System.out.println("Error saving guest information: " + e.getMessage());

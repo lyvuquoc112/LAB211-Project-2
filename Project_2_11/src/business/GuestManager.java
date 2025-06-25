@@ -26,12 +26,11 @@ import tool.DisplayFormatter;
 public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
     private boolean saved;
     private String pathFile;
+    private static GuestManager instance;
 
     public GuestManager() {
     }
 
-    
-    
     public GuestManager(String pathFile) {
         this.pathFile = pathFile;
     }
@@ -94,9 +93,9 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
 
     public void displayMonthlyRevenueReport(String targetMonth, RoomManager roomManager) {
         try {
-            // 1. Chuyển đổi chuỗi tháng thành Date
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
-            Date date = dateFormat.parse(targetMonth);
+            //1. Chuyển đổi chuỗi tháng thành Date
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
+            Date date = sdf.parse(targetMonth);
             
             // 2. Lấy tháng và năm từ Date
             Calendar cal = Calendar.getInstance();
@@ -119,14 +118,9 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
                     if (room != null) {
                         double revenue = room.getDailyRate() * guest.getRentalDays();
                         revenueByRoom.put(guest.getRoomId(), revenue);
-                    } else {
-                        // Ghi log hoặc thông báo lỗi
-                        System.out.println("Warning: Room " + guest.getRoomId() + 
-                            " does not exist for guest " + guest.getNationalId());
                     }
                 }
-            }
-            
+            } 
             // 5. Hiển thị báo cáo
             System.out.println("\nMonthly Revenue Report - '" + targetMonth + "'");
             System.out.println("----------------------------------------------------------------");
@@ -158,7 +152,7 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
 
     public boolean isRoomRented(String roomId) {
         for (Guest guest : this) {
-            if (guest.getRoomId().equals(roomId)) {
+            if (guest.getRoomId().equalsIgnoreCase(roomId)) {
                 return true;
             }
         }
@@ -224,9 +218,17 @@ public class GuestManager extends HashSet<Guest> implements Workable<Guest> {
                     oos.writeObject(guest);
                 }
                 System.out.println("Guest information has been successfully saved to "+pathFile);
+                this.saved = true;
             }
         } catch (IOException e) {
             System.out.println("Error saving guest information: " + e.getMessage());
         }
+    }
+
+    public static GuestManager getInstance(String pathFile) {
+        if (instance == null) {
+            instance = new GuestManager(pathFile);
+        }
+        return instance;
     }
 }

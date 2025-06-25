@@ -6,10 +6,14 @@ package dispatcher;
 
 import business.GuestManager;
 import business.RoomManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import model.Guest;
+import model.Room;
 import tool.Inputter;
 import tool.Validator;
+import tool.View;
 
 /**
  *
@@ -18,6 +22,7 @@ import tool.Validator;
 public class Menu {
 
     private static final int CONTINUE = 1;
+    
     private static final int IMPORT_ROOM_DATA_FROM_TEXT_FILE = 1;
     private static final int DISPLAY_AVAILABLE_ROOM_LIST = 2;
     private static final int ENTER_GUEST_INFORMATION = 3;
@@ -43,34 +48,22 @@ public class Menu {
     }
 
     private static void showMenu() {
-        System.out.println("\n=== ATZ RESORT MANAGEMENT SYSTEM ===");
-        System.out.println("1. Import Room Data from Text File");
-        System.out.println("2. Display Available Room List");
-        System.out.println("3. Enter Guest Information");
-        System.out.println("4. Update Guest Stay Information");
-        System.out.println("5.");
-        System.out.println("6. Delete Guest Reservation Before Arrival");
-        System.out.println("7.");
-        System.out.println("8.");
-        System.out.println("9.");
-        System.out.println("10. Save Guest Information");
-        System.out.println("0. Quit");
+        View.showMenu();
     }
 
     private static int getMenuChoice() {
-        int result = 0;
-        boolean more = false;
+        int result;
         do {
             System.out.print("Enter Test Case No. : ");
             try {
                 result = Integer.parseInt(scanner.nextLine());
-                more = true;
-            } catch (Exception e) {
+                if(result >= 0 && result <=10){
+                    return result;
+                }
+            } catch (NumberFormatException e) {
                 System.out.println("Accept only interger. Please Re-enters");
-
             }
-        } while (!more);
-        return result;
+        } while (true);   
     }
 
     private static void handelImportRoomDataFromTextFile() {
@@ -79,7 +72,7 @@ public class Menu {
     }
 
     private static void handelDisplayAvailableRoomList() {
-        roomManager.displayAvailableRoomList();
+        View.displayRoomList(roomManager);
     }
 
     private static void handelEnterGuestInformation() {
@@ -93,7 +86,6 @@ public class Menu {
     }
 
     private static void handelUpdateGuestStayInformation() {
-        System.out.println("\n=== Update Guest Stay Information ===");
         String ID = inputter.input("Input National ID", "National ID must be exactly 12 digits", Validator.NATIONAL_ID_PATTERN);
         Guest guest = guestManager.findGuestById(ID);
         if (guest == null) {
@@ -110,11 +102,30 @@ public class Menu {
         }
     }
 
-   
+    private static void handelSearchGuestByNationalID() {
+        int option;
+        do {
+            System.out.println("Enter National ID: ");
+            String nationalID = scanner.nextLine();
+            Guest g = guestManager.findGuestById(nationalID);
+            if (g != null) {
+                View.displayGuestInfo(g);
+                guestManager.displayGuestAndRoomInformation(g, roomManager);
+            } else {
+                System.out.println("--------------------------------------------------------------------");
+                System.out.println("No guest found with the requested ID '" + nationalID + "'");
+                System.out.println("--------------------------------------------------------------------");
+
+            }
+            System.out.println("1. Continue entering customer information");
+            System.out.println("2. Back to main menu");
+            option = Integer.parseInt(inputter.input("Chose your option", "Option must be 1 or 2", "^[12]$"));
+        } while (option == CONTINUE);
+    }
 
     private static void handelDeleteGuestReservation() {
         int option;
-        do {
+        do{
             System.out.println("Enter National ID: ");
             String nationalID = scanner.nextLine();
             Guest gues = guestManager.findGuestById(nationalID);
@@ -141,6 +152,32 @@ public class Menu {
         } while (option == CONTINUE);
     }
 
+    private static void handelListVacantRooms() {
+        List<Room> vacantRooms = new ArrayList<>();
+        for (Room room : roomManager) {
+            if (!guestManager.isRoomRented(room.getRoomId())) {
+                vacantRooms.add(room);
+            }
+        }
+        View.displayVacantRooms(vacantRooms);
+    }
+
+    private static void handelMonthlyRevenueReport() {
+        String targetMonth = inputter.input("Enter target month (MM/YYYY): ",
+                "Invalid format. Please use MM/YYYY format.",
+                "^(0[1-9]|1[0-2])/\\d{4}$");
+        guestManager.displayMonthlyRevenueReport(targetMonth, roomManager);
+    }
+
+    private static void handelRevenueReportByRoomType() {
+        System.out.println("\nSelect Room Type:");
+        System.out.println("1. Deluxe");
+        System.out.println("2. Standard");
+        System.out.println("3. Suite");
+        System.out.println("4. Superior");
+        String roomType =scanner.nextLine().trim();
+        guestManager.displayRevenueByRoomType(roomType, roomManager);
+    }
 
     private static void handelSaveGuestInformation() {
         guestManager.saveGuestInfo();
@@ -165,19 +202,19 @@ public class Menu {
                 handelUpdateGuestStayInformation();
                 break;
             case SEARCH_GUEST_BY_NATIONAL_ID:
-               
+                handelSearchGuestByNationalID();
                 break;
             case DELETE_GUEST_RESERVATION:
                 handelDeleteGuestReservation();
                 break;
             case LIST_VACANT_ROOMS:
-               
+                handelListVacantRooms();
                 break;
             case MONTHLY_REVENUE_REPORT:
-                
+                handelMonthlyRevenueReport();
                 break;
             case REVENUE_REPORT_BY_ROOM_TYPE:
-                
+                handelRevenueReportByRoomType();
                 break;
             case SAVE_GUEST_INFORMATION:
                 handelSaveGuestInformation();

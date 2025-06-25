@@ -11,7 +11,6 @@ import java.util.Objects;
  * @author hanly
  */
 public class Room {
-
     private String roomId;
     private String roomName;
     private String roomType;
@@ -98,5 +97,6 @@ public class Room {
         final Room other = (Room) obj;
         return Objects.equals(this.roomId, other.roomId);
     }
-
+    
+    
 }

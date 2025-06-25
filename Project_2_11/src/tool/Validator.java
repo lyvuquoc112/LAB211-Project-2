@@ -1,8 +1,11 @@
 package tool;
 
 
+import java.time.format.DateTimeFormatter;
+
 
 public class Validator {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
     // Regex patterns
     public static final String NATIONAL_ID_PATTERN = "^\\d{12}$";
